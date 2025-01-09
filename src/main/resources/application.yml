@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: spring-boot-mongodb-observability
+  data:
+    mongodb:
+      uri: mongodb://root:password@localhost:28017/sbmo?directConnection=true&authSource=admin
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+    jmx:
+      exposure:
+        exclude: "*"
+  metrics:
+#    mongo:
+#      command:
+#        enabled: false
+  tracing:
+    sampling:
+      probability: 1.0
+#    enabled: true
+  prometheus:
+    metrics:
+      export:
+        enabled: false
+  otlp:
+    logging:
+      export:
+        enabled: false
+    metrics:
+      export:
+        enabled: false
+    tracing:
+      export:
+        enabled: false
+      endpoint: http://localhost:4318/v1/traces # default
+
+logging:
+  pattern:
+    correlation: "[${spring.application.name:},%X{traceId:-},%X{spanId:-}]"
+    include-application-name: false
+  level:
+    org:
+      springframework:
+        data:
+          mongodb: debug
