@@ -4,7 +4,12 @@ spring:
   data:
     mongodb:
       uri: mongodb://root:password@localhost:28017/sbmo?directConnection=true&authSource=admin
+
 management:
+  # enable usage of @NewSpan
+  observations:
+    annotations:
+      enabled: true
   endpoints:
     web:
       exposure:

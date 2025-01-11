@@ -42,3 +42,4 @@ To configure datasource in `./container/provisioning/datasources`, create 1 yaml
 - [grafana-provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/)
 - [grafana-sample-datasources](https://fossies.org/linux/grafana/devenv/datasources.yaml)
   - [tempo](https://grafana.com/docs/grafana/latest/datasources/tempo/configure-tempo-data-source/#provision-the-data-source)
+- [grafana-sample](https://github.com/grafana/tempo/blob/main/example/docker-compose/local/docker-compose.yaml)
