@@ -1,0 +1,107 @@
+services:
+  mongo:
+    image: mongo:latest
+    container_name: sbmo-mongo
+    ports:
+      - "28017:27017"
+    volumes:
+      - sbmo_mongo_db:/data/db
+      - sbmo_mongo_configdb:/data/configdb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: password
+    restart: unless-stopped
+
+  grafana:
+    image: grafana/grafana:11.4.0
+    container_name: sbmo-grafana
+    restart: unless-stopped
+    volumes:
+      - sbmo_grafana_data:/var/lib/grafana
+    environment:
+      GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      GF_AUTH_ANONYMOUS_ENABLED: true
+      GF_AUTH_ANONYMOUS_ORG_ROLE: Admin
+    entrypoint:
+      - sh
+      - -euc
+      - |
+        mkdir -p /etc/grafana/provisioning/datasources
+        cat <<EOF > /etc/grafana/provisioning/datasources/ds.yaml
+        apiVersion: 1
+        datasources:
+        - name: Loki
+          type: loki
+          access: proxy 
+          orgId: 1
+          url: http://loki:3100
+          basicAuth: false
+          isDefault: true
+          version: 1
+          editable: false
+        EOF
+        /run.sh
+    # env_file:
+    #   - ./grafana/config.monitoring
+    ports:
+      - "3000:3000"
+    networks:
+      - sbmo
+
+  prometheus:
+    image: prom/prometheus:v3.1.0
+    container_name: sbmo-prometheus
+    restart: unless-stopped
+    volumes:
+      - sbmo_prometheus_data:/prometheus
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.enable-remote-write-receiver'
+      - '--enable-feature=exemplar-storage'
+      - '--enable-feature=native-histograms'
+    ports:
+      - "9090:9090"
+    networks:
+      - sbmo
+
+  loki:
+    image: grafana/loki:3.3.2
+    container_name: sbmo-loki
+    restart: unless-stopped
+    ports:
+      - "3100:3100"
+    command: "-config.file=/etc/loki/config.yaml"
+    volumes:
+      - ./loki-config.yaml:/etc/loki/config.yaml
+    networks:
+      - sbmo
+
+  tempo:
+    image: grafana/tempo:2.6.1
+    container_name: sbmo-tempo
+    restart: unless-stopped
+    command: "-config.file=/etc/tempo.yaml"
+    volumes:
+      - ./tempo.yaml:/etc/tempo.yaml
+      - sbmo_tempo_data:/tmp/tempo
+    ports:
+      - "14268:14268"  # jaeger ingest
+      - "3200:3200"   # tempo
+      - "9095:9095" # tempo grpc
+      - "4317:4317"  # otlp grpc
+      - "4318:4318"  # otlp http
+      - "9411:9411"   # zipkin
+    networks:
+      - sbmo
+
+networks:
+  sbmo:
+    driver: 'bridge'
+
+volumes:
+  sbmo_mongo_db:
+  sbmo_mongo_configdb:
+  sbmo_grafana_data:
+  sbmo_prometheus_data:
+  sbmo_tempo_data:
