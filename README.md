@@ -28,6 +28,17 @@ Ignore the error about exporting spans
 Failed to export spans. The request could not be executed. Full error message: Failed to connect to localhost/[0:0:0:0:0:0:0:1]:4318
 ```
 
+## Monitoring Stack
+
+### Grafana
+
+To configure datasource in `./container/provisioning/datasources`, create 1 yaml per source. To configure for `jsonData`, one trick is to manually configure via the UI, and launch devtools, monitor the network and look out for `<datasource-uid>?accesscontrol=true` which will show how the `jsonData` is formed. Or even better, call `http://localhost:3000/api/datasources` to extract it.
+
 ## References
 
 - [Spring Data MongoDB Observability](https://docs.spring.io/spring-data/mongodb/reference/observability/observability.html)
+- [spring-boot-monitoring](https://github.com/cristianprofile/spring-boot-monitoring)
+- [observability-with-spring-boot-3](https://spring.io/blog/2022/10/12/observability-with-spring-boot-3)
+- [grafana-provisioning](https://grafana.com/docs/grafana/latest/administration/provisioning/)
+- [grafana-sample-datasources](https://fossies.org/linux/grafana/devenv/datasources.yaml)
+  - [tempo](https://grafana.com/docs/grafana/latest/datasources/tempo/configure-tempo-data-source/#provision-the-data-source)

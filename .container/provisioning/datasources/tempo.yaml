@@ -1,0 +1,38 @@
+apiVersion: 1
+
+# https://grafana.com/docs/grafana/latest/datasources/tempo/configure-tempo-data-source/#provision-the-data-source
+datasources:
+  - name: Tempo
+    uid: tempo
+    type: tempo
+    access: proxy
+    url: http://tempo:3200
+    basicAuth: false
+    isDefault: false
+    version: 1
+    editable: false
+    jsonData:
+      tracesToLogsV2:
+        # Field with an internal link pointing to a logs data source in Grafana.
+        # datasourceUid value must match the uid value of the logs data source.
+        datasourceUid: 'loki'
+        tags: [
+          {
+            key: 'service.name',
+            value: 'app'
+          }
+        ]
+      tracesToMetrics:
+          datasourceUid: 'prometheus'
+          tags: [
+            {
+              key: 'service.name',
+              value: 'app'
+            },
+            {
+              key: 'job'
+            }
+          ]
+          queries:
+            - name: 'Sample query'
+              query: 'sum(rate(traces_spanmetrics_latency_bucket{$$__tags}[5m]))'

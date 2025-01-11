@@ -1,0 +1,19 @@
+apiVersion: 1
+
+# https://grafana.com/docs/grafana/latest/datasources/loki/configure-loki-data-source/
+datasources:
+  - name: Loki
+    uid: loki
+    type: loki
+    access: proxy
+    url: http://loki:3100
+    basicAuth: false
+    isDefault: true
+    version: 1
+    editable: false
+    jsonData:
+      derivedFields:
+        - datasourceUid: tempo
+          matcherRegex: \[.+?,(.+?),(.+?)]
+          url: $${__value.raw}
+          name: traceId

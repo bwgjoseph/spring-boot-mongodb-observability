@@ -4,7 +4,6 @@ spring:
   data:
     mongodb:
       uri: mongodb://root:password@localhost:28017/sbmo?directConnection=true&authSource=admin
-
 management:
   endpoints:
     web:
@@ -14,6 +13,8 @@ management:
       exposure:
         exclude: "*"
   metrics:
+    # For Exemplars to work we need histogram buckets
+    distribution.percentiles-histogram.http.server.requests: true
 #    mongo:
 #      command:
 #        enabled: false
@@ -22,19 +23,19 @@ management:
       probability: 1.0
 #    enabled: true
   prometheus:
-    metrics:
-      export:
-        enabled: false
+#    metrics:
+#      export:
+#        enabled: true
   otlp:
-    logging:
-      export:
-        enabled: false
-    metrics:
-      export:
-        enabled: false
+#    logging:
+#      export:
+#        enabled: false
+#    metrics:
+#      export:
+#        enabled: false
     tracing:
-      export:
-        enabled: false
+#      export:
+#        enabled: false
       endpoint: http://localhost:4318/v1/traces # default
 
 logging:
